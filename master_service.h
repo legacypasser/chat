@@ -1,5 +1,5 @@
 #pragma once
-
+#include <time.h>
 ////////////////////////////////////////////////////////////////////////////////
 // 配置内容项
 
@@ -17,6 +17,12 @@ extern acl::master_int64_tbl var_conf_int64_tab[];
 
 ////////////////////////////////////////////////////////////////////////////////
 
+struct Onliner
+{
+    char id[8];
+    char addr[24];
+    time_t last;
+};
 //class acl::socket_stream;
 
 class master_service : public acl::master_udp
@@ -31,6 +37,16 @@ protected:
 	 * @param stream {aio_socket_stream*} 本地 UDP 网络流
 	 */
 	virtual void on_read(acl::socket_stream* stream);
+
+    static ACL_HTABLE *htable;
+
+    bool add(struct Onliner* one);
+
+    struct Onliner* get(const char* id);
+
+    bool remove(const char* id);
+
+
 
 	/**
 	 * 当进程切换用户身份后调用的回调函数，此函数被调用时，进程
