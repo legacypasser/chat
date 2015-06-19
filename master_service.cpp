@@ -90,23 +90,15 @@ void master_service::on_read(acl::socket_stream* stream)
             id[i - 6] = buf[i];
         }
     id[i - 6] = 0;
-    client = (struct Onliner*)get(id);
-        if(client == NULL)
-            {
-                client = new struct Onliner;
-                strcpy(client->id, id);
-                strcpy(client->addr, stream->get_peer(true));
-                time(&(client->last));
-                add(client);
-            }
-        else{
-                strcpy(client->addr, stream->get_peer(true));	
-                time(&(client->last));
-	   }
+    
     switch(buf[4]){
     case '1':
+    	client = (struct Onliner*)get(id);
+        update(client, stream->get_peer(true));
 		return;
     case '2':
+    	client = (struct Onliner*)get(id);
+    	update(client, stream->get_peer(true));
         i++;
         for(pos = 0; buf[i] != ';'; i++, pos++)
             target[pos] = buf[i];
@@ -121,9 +113,15 @@ void master_service::on_read(acl::socket_stream* stream)
                 timeChar[pos] = buf[i];
             timeChar[pos] = 0;
             n = snprintf(buf, sizeof(buf), "00004;%s", timeChar);
-        }
+        }        
         break;
     case '3':
+    	i++;
+        for(pos = 0; buf[i] != ';'; i++, pos++)
+            target[pos] = buf[i];
+        target[pos] = 0;
+        client = (struct Onliner*)get(target);
+        update(client, stream->get_peer(true));
         client = (struct Onliner*)get(id);
         stream->set_peer(client->addr);
         break;
@@ -133,6 +131,17 @@ void master_service::on_read(acl::socket_stream* stream)
 
     }
 	stream->write(buf, n);
+}
+
+void master_service::update(struct Onliner* client, const char* addr)
+{
+	if(client == NULL){
+		client = new struct Onliner;
+        add(client);
+        strcpy(client->id, id);
+	}
+    strcpy(client->addr, addr);
+    time(&(client->last));             
 }
 
 void master_service::proc_on_init()
