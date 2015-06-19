@@ -132,7 +132,7 @@ void master_service::on_read(acl::socket_stream* stream)
 
 void master_service::update(const char* id, const char* addr)
 {
-	client = (struct Onliner*)get(id);
+	struct Onliner* client = (struct Onliner*)get(id);
 	if(client == NULL){
 		client = new struct Onliner;
         add(client);
