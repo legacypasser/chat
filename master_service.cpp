@@ -64,11 +64,10 @@ struct Onliner* master_service::get(const char* id)
 
 bool master_service::remove(const char* id)
 {
-    int result = acl_htable_delete(htable, id, NULL);
-    if(result == 0)
+	if(get(id) == NULL)
+	return false;
+    acl_htable_delete(htable, id, NULL);
         return true;
-    else
-        return false;
 }
 
 
@@ -115,9 +114,7 @@ void master_service::on_read(acl::socket_stream* stream)
         client = (struct Onliner*)get(target);
         if(client != NULL && currentTime - client->last < 120){
             stream->set_peer(client->addr);
-		logger("should direct %s", buf);
         }else{
-		logger("should http %s", buf);
             i++;
             for(pos = 0; buf[i] != ';'; i++, pos++)
                 timeChar[pos] = buf[i];
@@ -130,7 +127,6 @@ void master_service::on_read(acl::socket_stream* stream)
         stream->set_peer(client->addr);
         break;
 	case '4':
-	client = (struct Onliner*)get(id);
 	remove(id);
 	break;	
 
