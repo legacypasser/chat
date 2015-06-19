@@ -93,12 +93,10 @@ void master_service::on_read(acl::socket_stream* stream)
     
     switch(buf[4]){
     case '1':
-    	client = (struct Onliner*)get(id);
-        update(client, stream->get_peer(true));
+        update(id, stream->get_peer(true));
 		return;
     case '2':
-    	client = (struct Onliner*)get(id);
-    	update(client, stream->get_peer(true));
+    	update(id, stream->get_peer(true));
         i++;
         for(pos = 0; buf[i] != ';'; i++, pos++)
             target[pos] = buf[i];
@@ -120,8 +118,7 @@ void master_service::on_read(acl::socket_stream* stream)
         for(pos = 0; buf[i] != ';'; i++, pos++)
             target[pos] = buf[i];
         target[pos] = 0;
-        client = (struct Onliner*)get(target);
-        update(client, stream->get_peer(true));
+        update(target, stream->get_peer(true));
         client = (struct Onliner*)get(id);
         stream->set_peer(client->addr);
         break;
@@ -133,8 +130,9 @@ void master_service::on_read(acl::socket_stream* stream)
 	stream->write(buf, n);
 }
 
-void master_service::update(struct Onliner* client, const char* addr)
+void master_service::update(const char* id, const char* addr)
 {
+	client = (struct Onliner*)get(id);
 	if(client == NULL){
 		client = new struct Onliner;
         add(client);
