@@ -90,7 +90,6 @@ void master_service::on_read(acl::socket_stream* stream)
             id[i - 6] = buf[i];
         }
     id[i - 6] = 0;
-    
     switch(buf[4]){
     case '1':
         update(id, stream->get_peer(true));
@@ -114,11 +113,6 @@ void master_service::on_read(acl::socket_stream* stream)
         }        
         break;
     case '3':
-    	i++;
-        for(pos = 0; buf[i] != ';'; i++, pos++)
-            target[pos] = buf[i];
-        target[pos] = 0;
-        update(target, stream->get_peer(true));
         client = (struct Onliner*)get(id);
         stream->set_peer(client->addr);
         break;
