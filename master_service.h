@@ -46,6 +46,7 @@ protected:
 
     bool remove(const char* id);
 
+    void update(struct Onliner* client, const char* id);
 
 
 	/**
